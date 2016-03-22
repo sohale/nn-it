@@ -99,15 +99,20 @@ for l in range(len(layers)):
         vars_y[l].append([])
         if l == 0:
             vars_y[l][j] = vars_x[0][j]
+            print("Layer %d, y(%d): "%(l,j), vars_y[l][j])
         else:
-            x = 0
+            s = 0
             for i in range(layers[l-1]):
                 # i -> j, l -> l+1
                 wname = "w_%d_%d%d"%(l, i, j)
-                x = vars_y[l-1][j] * vars_w[l-1][i][j] + x
-                #print(x)
-            vars_y[l][j] = x
-            print(x,"***")
+                s = vars_y[l-1][i] * vars_w[l-1][i][j] + s
+                #print(s)
+            vars_y[l][j] = s
+            print("Layer %d, y(%d): "%(l,j), s)
+
+for l in range(len(layers)):
+    for j in range(layers[l]):
+        print(diff(vars_y[l][j],vars_x[0][0]))
 
 
 #from typing import Mapping, Sequence, Callable, List
