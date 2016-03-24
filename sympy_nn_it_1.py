@@ -36,7 +36,7 @@ print( diff(y1, x3) )
 # 0
 
 #layers = [3,4,2]
-layers = [3, 2]
+layers = [3, 2, 3]
 
 
 #contains sympy variables
