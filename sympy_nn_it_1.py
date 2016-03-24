@@ -48,8 +48,6 @@ layers = [3, 2, 3]
 # prepare the space of variables
 #vars_x = [[None, None], [None,None], [None, None]] 
 vars_x = []
-#M = layers[0]
-#N = layers[1]
 L = len(layers)
 for l in range(L):
     vars_x.append([])
@@ -60,7 +58,8 @@ for l in range(L):
         #print(vars_x[i][j])
         vars_x[l].append(s)
         assert vars_x[l][i] == s
-
+        print(vars_x[l][i])
+print()
 
 # x_li -> 
 
@@ -93,10 +92,15 @@ for l in range(len(layers)-1):
         print()
 
 vars_y = []
+vars_yx = []  # y based on immediate x
 for l in range(len(layers)):
     vars_y.append([])
+    vars_yx.append([])
     for j in range(layers[l]):
-        vars_y[l].append([])
+        vars_y[l].append("DUMMY")
+        vars_yx[l].append("DUMMY")
+        #assert exists vars_y[l][j] 
+        print("len=", len(vars_yx[l]))
         if l == 0:
             vars_y[l][j] = vars_x[0][j]
             print("Layer %d, y(%d): "%(l,j), vars_y[l][j])
@@ -108,13 +112,39 @@ for l in range(len(layers)):
                 s = vars_y[l-1][i] * vars_w[l-1][i][j] + s
                 #print(s)
             vars_y[l][j] = tanh(s)
-            print("Layer %d, y(%d): "%(l,j), vars_y[l][j])
 
+            s = 0
+            for i in range(layers[l-1]):
+                # i -> j, l -> l+1
+                wname = "w_%d_%d%d"%(l, i, j)
+                s = vars_x[l-1][i] * vars_w[l-1][i][j] + s
+            yx = tanh(s)
+            vars_yx[l][j] = yx
+
+            print("Layer %2d, y(%d): "%(l,j), vars_y[l][j])
+            print("Layer %2d, x(%d): "%(l,j), vars_yx[l][j])
+        print("len2=", len(vars_yx[l]))
+
+print()
 for l in range(len(layers)):
     for j in range(layers[l]):
         print(diff(vars_y[l][j],vars_x[0][0]))
 
+print()
+for l in range(1, len(layers)):
+    for j in range(layers[l]):
+        for i in range(layers[l-1]):
+            by = vars_y[l-1][i]
+            y = vars_y[l][j]
+            print("d[%s]/d[%s]  = "% ("y","y"), #(str(y), str(by),), 
+                diff(y, by))
+            #simplify: too slow
+
+print()
+for l in range(len(layers)):
+    for j in range(layers[l]):
+        for i in range(layers[l-1]):
+            print("y based on previous x: ", diff(vars_yx[l][j],vars_x[l-1][i]))
 
 #from typing import Mapping, Sequence, Callable, List
 # Vector = List[List[]]
-
