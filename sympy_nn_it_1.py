@@ -35,9 +35,13 @@ print( diff(y1, x2) )
 print( diff(y1, x3) )
 # 0
 
+
+#from typing import Mapping, Sequence, Callable, List
+# Vector = List[List[]]
+
+
 #layers = [3,4,2]
 layers = [3, 2, 3]
-
 
 #contains sympy variables
 #for i in range(M):
@@ -144,7 +148,25 @@ print()
 for l in range(len(layers)):
     for j in range(layers[l]):
         for i in range(layers[l-1]):
-            print("y based on previous x: ", diff(vars_yx[l][j],vars_x[l-1][i]))
+            print("y based on previous x: ", diff(vars_yx[l][j], vars_x[l-1][i]))
 
-#from typing import Mapping, Sequence, Callable, List
-# Vector = List[List[]]
+
+
+""" Generate C code """
+from sympy.utilities.codegen import codegen
+
+
+# sympy.utilities.codegen.codegen(name_expr, language, prefix=None, project='project', to_files=False, header=True, empty=True, argument_sequence=None, global_vars=None)
+
+formula = diff(vars_y[l][j],vars_x[0][0])
+
+#from sympy.abc import x, y, z
+[(c_name, c_code), (h_name, c_header)] = codegen(  ("f1", formula), "C", "test", header=False, empty=False)
+
+print(c_name)
+print(c_code)
+
+
+#for other languages see: http://docs.sympy.org/dev/_modules/sympy/utilities/codegen.html
+# Also: https://github.com/jsyk/spnsyn-demo/blob/master/ftl/vhdlcodegen.py
+#todo: quantum computing
