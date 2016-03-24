@@ -107,8 +107,8 @@ for l in range(len(layers)):
                 wname = "w_%d_%d%d"%(l, i, j)
                 s = vars_y[l-1][i] * vars_w[l-1][i][j] + s
                 #print(s)
-            vars_y[l][j] = s
-            print("Layer %d, y(%d): "%(l,j), s)
+            vars_y[l][j] = tanh(s)
+            print("Layer %d, y(%d): "%(l,j), vars_y[l][j])
 
 for l in range(len(layers)):
     for j in range(layers[l]):
