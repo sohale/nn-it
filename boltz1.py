@@ -246,17 +246,18 @@ def sampling_demo():
 def naive_gauss_reproduce_demo():
     d = MNISTLoader('test')
     vects, labels = d.get_full_data()
+    #ndim = vects.shape[1]
     vects = (vects > 0.5)*1.
-    #sample_size, n = vects.shape
+    sample_size, ndim = vects.shape
     #num_samples_taken_into_account = 1000
     #v_sub = vects[:num_samples_taken_into_account, :]
-    v_sub = vects[::50, :]
-    mu = np.sum(v_sub, axis=0)
+    v_sub = vects[::50, :]; sample_size = v_sub.shape[1]
+    mu = np.mean(v_sub, axis=0)
     for si in range(v_sub.shape[0]):
         #v_sub[si] = v_sub[si] - mean(v_sub[i])
-        v_sub[si] = v_sub[si] - mu*0
+        v_sub[si] = v_sub[si] - mu
     print "calculating autocorrelation",;flush_stdout()
-    autocorr = np.dot(v_sub.T, v_sub)
+    autocorr = np.dot(v_sub.T, v_sub) / float(sample_size)
     print "."; flush_stdout()
     print autocorr.shape
     cov = autocorr
@@ -264,10 +265,11 @@ def naive_gauss_reproduce_demo():
     for i in range(20):
         #Works, but why the mean should not be subtracted?
         alpha = 1
-        s = np.random.multivariate_normal(mu*0, cov*alpha+(1.-alpha)*np.eye(vects.shape[1]))
+        s = np.random.multivariate_normal(mu, cov*alpha+(1.-alpha)*np.eye(ndim))
         #s = mu
         s28x28 = s.reshape(28, 28)
         show_image(s28x28)
+    #Problem: 3 is too dominant
 
 if __name__ == '__main__':
     #test_mnist()
