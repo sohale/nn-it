@@ -299,11 +299,13 @@ def naive_gauss_reproduce_demo():
     sample_size, ndim = vects.shape
     #num_samples_taken_into_account = 1000
     #v_sub = vects[:num_samples_taken_into_account, :]
-    v_sub = vects[::1, :]; sample_size = v_sub.shape[1]
+    #REDUCE the number of samples
+    v_sub = vects[::50, :]; sample_size = v_sub.shape[1]
     mu = np.mean(v_sub, axis=0)  # * 0.
     mu_scalar=np.mean(mu.ravel())  #scalar
     mu_scalar = float(mu_scalar)
     mu = mu * 0 + mu_scalar
+    #mu = mu * 0
 
 
     if False:
@@ -326,7 +328,7 @@ def naive_gauss_reproduce_demo():
             print "si:%d      \r"%(si,),
 
     print "calculating autocorrelation",;flush_stdout()
-    autocorr = np.dot(v_sub.T, v_sub) / float(sample_size)
+    autocorr = np.dot(v_sub.T, v_sub) / float(sample_size) * 0.0001
     print "."; flush_stdout()
     print autocorr.shape
     cov = autocorr
@@ -375,4 +377,34 @@ if __name__ == '__main__':
 
     #Restricted BM is another idea.
     #It can be seen as just adding dimensions. But what about preserving infomration between V, H?
+
+    #A way to increase capacity is to add extra variables (hidden).
+    #But what will this mean in terms of RBM/multiple layers? (remember: they could be arbitrary). It is attaching them to another Gaussian. So it keeps reducing dimensions untill it "closes" the distribution (by specifyint all dimensions).
+    #Problem: Combining two Gaussians is Gaussian. To increasing dimensions is useful, but attaching them to another Gaussian is useless. It gives the problem to another external machine to solve. But it would need a nonlinearity.
+
+    #Adding the mean in sampling, means we add a white '3'. Which means the raw samples have a hole in '3' otherwise.
+
+    #Howdo we improve this? More samples? No, not enough.
+
+    #But people already have used Eigenfaces. They probably have tries sampling from that space too.
+    #And the results now do look like eigenfaces (e.g. DC comonent in back). Back to Gaussian: how can we force eigenfaces to do differently.
+    #But that's PCA/dim-reduction. 
+    #Yes: Gaussian does reduce the dimenions, but it is not easy to see the reduces dimensiones. But they still obey the eigenvectors. The eigenvectors encode the correaltions. But not explicitly. PCA makes them explicit.
+    #The PCA/RBM => explicitly extract that space: Some Q where  vAv = vQBQv
+
+    #What would 'sampling' (as in PatternTheory) mean in a PCA/Eigenface mindset?
+    #We kind of reduce the dimensions and then reproduce it. But it's still not the sampling idea.
+
+    #What RBM adds is notin of marginalisation and condisioning (clamping)
+    #Marginalising = Activity function. (but plus Expected value?)
+    #Activity is also population-marginalisation.
+
+    #Why is it not smooth anymore?
+
+    #We need to inject an external distribution. That is, H distribution in RBM.
+    #But in MLP, it is the output. In PT (Pattern Theory/sampling approach), it is [generated?].
+
+    #BTW, Where is the nonlinearity (of MLP)?
+
+    #In Gaussian, crrelation is between pairs only. In one-layer [R]BM, too.
 
