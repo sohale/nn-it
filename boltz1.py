@@ -246,7 +246,7 @@ def sampling_demo():
 def naive_gauss_reproduce_demo():
     d = MNISTLoader('test')
     vects, labels = d.get_full_data()
-    #vects = (vects > 0.5)*1.
+    vects = (vects > 0.5)*1.
     #sample_size, n = vects.shape
     #num_samples_taken_into_account = 1000
     #v_sub = vects[:num_samples_taken_into_account, :]
@@ -254,14 +254,18 @@ def naive_gauss_reproduce_demo():
     mu = np.sum(v_sub, axis=0)
     for si in range(v_sub.shape[0]):
         #v_sub[si] = v_sub[si] - mean(v_sub[i])
-        v_sub[si] = v_sub[si] - mu
+        v_sub[si] = v_sub[si] - mu*0
     print "calculating autocorrelation",;flush_stdout()
     autocorr = np.dot(v_sub.T, v_sub)
     print "."; flush_stdout()
+    print autocorr.shape
     cov = autocorr
     #mu = np.sum(v_sub, axis=0)
     for i in range(20):
-        s = np.random.multivariate_normal(mu, cov)
+        #Works, but why the mean should not be subtracted?
+        alpha = 1
+        s = np.random.multivariate_normal(mu*0, cov*alpha+(1.-alpha)*np.eye(vects.shape[1]))
+        #s = mu
         s28x28 = s.reshape(28, 28)
         show_image(s28x28)
 
