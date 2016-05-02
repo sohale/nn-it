@@ -299,15 +299,18 @@ def naive_gauss_reproduce_demo():
     sample_size, ndim = vects.shape
     #num_samples_taken_into_account = 1000
     #v_sub = vects[:num_samples_taken_into_account, :]
-    v_sub = vects[::50, :]; sample_size = v_sub.shape[1]
+    v_sub = vects[::1, :]; sample_size = v_sub.shape[1]
     mu = np.mean(v_sub, axis=0)  # * 0.
     mu_scalar=np.mean(mu.ravel())  #scalar
     mu_scalar = float(mu_scalar)
     mu = mu * 0 + mu_scalar
 
-    for si in range(v_sub.shape[0]):
+
+    if False:
+      for si in range(v_sub.shape[0]):
         #v_sub[si] = v_sub[si] - mean(v_sub[i])
-        dx, dy = np.random.randint(-5,5), np.random.randint(-5,5)
+        #dx, dy = np.random.randint(-15,15), np.random.randint(-15,15)  #too scrambled
+        dx, dy = np.random.randint(-15,15), np.random.randint(-15,15)  #too scrambled
         v_sub[si] = I28x28.shift(v_sub[si], dx,dy, background=0)
         if False:
             v_sub[si] = v_sub[si] - mu
@@ -320,7 +323,7 @@ def naive_gauss_reproduce_demo():
             i4 = v_sub[si].copy()
             show_images([i1, i2, i3, i4])
         if (si+1) % 100 == 1:
-            print "si:%d      \r"%(si,)
+            print "si:%d      \r"%(si,),
 
     print "calculating autocorrelation",;flush_stdout()
     autocorr = np.dot(v_sub.T, v_sub) / float(sample_size)
@@ -367,4 +370,9 @@ if __name__ == '__main__':
 
     # A Bernouli version of Gaussian?
 
+    #..
+    #We limit information by choosing Bernouli {0,1}.
+
+    #Restricted BM is another idea.
+    #It can be seen as just adding dimensions. But what about preserving infomration between V, H?
 
