@@ -300,7 +300,7 @@ def naive_gauss_reproduce_demo():
     #num_samples_taken_into_account = 1000
     #v_sub = vects[:num_samples_taken_into_account, :]
     #REDUCE the number of samples
-    v_sub = vects[::50, :]; sample_size = v_sub.shape[1]
+    v_sub = vects[::1, :]; sample_size = v_sub.shape[1]
     mu = np.mean(v_sub, axis=0)  # * 0.
     mu_scalar=np.mean(mu.ravel())  #scalar
     mu_scalar = float(mu_scalar)
@@ -332,16 +332,19 @@ def naive_gauss_reproduce_demo():
     print "."; flush_stdout()
     print autocorr.shape
     cov = autocorr
+    #fixme: How come is it NOT positive-semidifinite?
     #mu = np.sum(v_sub, axis=0)
-    for i in range(4):
-        plt.subplot(2,2, i)
+    ilist = []
+    for i in range(16):
         #Works, but why the mean should not be subtracted?
         alpha = 1
         s = np.random.multivariate_normal(mu, cov*alpha+(1.-alpha)*np.eye(ndim))
         #s = mu
-        s28x28 = s.reshape(28, 28)
-        show_image(s28x28, show=False)
-    plt.show()
+        ilist.append(s)
+        #s28x28 = s.reshape(28, 28)
+        #show_image(s28x28, show=False)
+    #plt.show()
+    show_images(ilist)
     #Problem: 3 is too dominant
     #Mean/covar bug fixed. Now makes sense in terms of classic mean/covariance.
 
@@ -408,3 +411,19 @@ if __name__ == '__main__':
 
     #In Gaussian, crrelation is between pairs only. In one-layer [R]BM, too.
 
+    #Observation: When I generate more samples, they all subjectively look similar. First guess, they all use a uniform distribution on the other side of the Gaussian. (Although we dont have hidden units, but we can see this as hidden units that have a purely Gasussian distribution).
+    #So, it just does a dim-reduction.
+    #=> Hence, The next step is to do an actual PCA.
+    #Hinton also compared it to PCA. Because it is really comparable to PCA. IT chooses the dimensions automatically. (Can it put weight on H dimentions?)
+
+    #(reminder) Output of RBM is between two Qs in vAv=vQhhQv. (minimizing vQh, and vQh->(Q^T)->v) However, PCA is also about breaking down A into QQ.
+    #What is added to RBM that makes it different to this PCA (Q)?
+
+    #Note, they dont look like the original because I just did sampling.
+
+    #The criterion for learning is to reproduce the input. But from what. From its map. But a map of course makes it. The map should reduce it really.
+    #So a Gaussian extention is a Linear trnaformation that is most faithful to input when the dimensions are Reduced: A PCA which those few dimensions is chosen based on this criterion. (But still the nonlinearity is has not entered.)
+    #Older Note: note that normalisation is key (implicitly used in Boltzmann's formalism as temperature).
+    #Brain's temperature: Neormalisation/[Audio-engineering's sense of]Compression.
+
+    #So we dont even reproduce  the distribution! The only criterion is reproducing it. (How dow it bring non-linearity?)
