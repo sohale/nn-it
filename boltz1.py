@@ -183,10 +183,12 @@ def factorize():
                 print i,
         print  # 2 4 7 8 14 16
 
-def show_image(matrix):
-    import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+
+def show_image(matrix, show=True):
     plt.imshow(matrix, cmap='bone')
-    plt.show()
+    if show:
+        plt.show()
     #plt.hist( np.log10(ea+leps), 150)
 
 def load_autocorrel_demo():
@@ -247,7 +249,7 @@ def naive_gauss_reproduce_demo():
     d = MNISTLoader('test')
     vects, labels = d.get_full_data()
     #ndim = vects.shape[1]
-    vects = (vects > 0.5)*1.
+    #vects = (vects > 0.5)*1.
     sample_size, ndim = vects.shape
     #num_samples_taken_into_account = 1000
     #v_sub = vects[:num_samples_taken_into_account, :]
@@ -262,14 +264,17 @@ def naive_gauss_reproduce_demo():
     print autocorr.shape
     cov = autocorr
     #mu = np.sum(v_sub, axis=0)
-    for i in range(20):
+    for i in range(4):
+        plt.subplot(2,2, i)
         #Works, but why the mean should not be subtracted?
         alpha = 1
         s = np.random.multivariate_normal(mu, cov*alpha+(1.-alpha)*np.eye(ndim))
         #s = mu
         s28x28 = s.reshape(28, 28)
-        show_image(s28x28)
+        show_image(s28x28, show=False)
+    plt.show()
     #Problem: 3 is too dominant
+    #Mean/covar bug fixed. Now makes sense in terms of classic mean/covariance.
 
 if __name__ == '__main__':
     #test_mnist()
