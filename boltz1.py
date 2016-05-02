@@ -191,6 +191,22 @@ def show_image(matrix, show=True):
         plt.show()
     #plt.hist( np.log10(ea+leps), 150)
 
+def show_images(matrix_list, grid_shape=None):
+    if grid_shape is None:
+        n = len(matrix_list)
+        w = int((n-0.000001)**(0.5) + 1)
+        h = int((n-.00000001)/w) + 1
+        print w, h
+    grid_shape = (w, h)
+
+    i = 0
+    for vector in matrix_list:
+        matrix = vector.reshape(28, 28)
+        plt.subplot(w, h, i+1)
+        plt.imshow(matrix, cmap='bone')
+        i+=1
+    plt.show()
+
 def load_autocorrel_demo():
     d = MNISTLoader('test')
     vec, label = d.get_raw_sample(100)
@@ -245,19 +261,67 @@ def sampling_demo():
         e = energy1(v)
         #incomplete
 
+class I28x28:
+    @staticmethod
+    def shift(v, xshift, yshift, background=0.):
+        matrix = v.reshape(28, 28).copy() #necessary
+        #print np.median(matrix)
+        #matrix[xshift:, yshift:] = matrix[:-1-xshift:, :-1-yshift]
+        assert int(xshift) == xshift
+        assert int(yshift) == yshift
+        assert int(xshift) == xshift
+        assert int(yshift) == yshift
+
+        if xshift > 0:
+            matrix[xshift:, :] = matrix[:-xshift, :]
+            matrix[:xshift, :] = background
+        elif xshift < 0:
+            matrix[:-xshift, :] = matrix[xshift:, :]
+            matrix[-xshift:, :] = background
+        else:
+            pass
+        if yshift > 0:
+            matrix[:, yshift:] = matrix[:, :-yshift]
+            matrix[:, :yshift] = background
+        elif yshift < 0:
+            matrix[:, :-yshift] = matrix[:, yshift:]
+            matrix[:, -yshift:] = background
+        else:
+            pass
+
+        return matrix.reshape(28*28)
+
 def naive_gauss_reproduce_demo():
     d = MNISTLoader('test')
     vects, labels = d.get_full_data()
     #ndim = vects.shape[1]
-    #vects = (vects > 0.5)*1.
+    vects = (vects > 0.5)*1.
     sample_size, ndim = vects.shape
     #num_samples_taken_into_account = 1000
     #v_sub = vects[:num_samples_taken_into_account, :]
     v_sub = vects[::50, :]; sample_size = v_sub.shape[1]
-    mu = np.mean(v_sub, axis=0)
+    mu = np.mean(v_sub, axis=0)  # * 0.
+    mu_scalar=np.mean(mu.ravel())  #scalar
+    mu_scalar = float(mu_scalar)
+    mu = mu * 0 + mu_scalar
+
     for si in range(v_sub.shape[0]):
         #v_sub[si] = v_sub[si] - mean(v_sub[i])
-        v_sub[si] = v_sub[si] - mu
+        dx, dy = np.random.randint(-5,5), np.random.randint(-5,5)
+        v_sub[si] = I28x28.shift(v_sub[si], dx,dy, background=0)
+        if False:
+            v_sub[si] = v_sub[si] - mu
+            i1 = v_sub[si].copy()
+            v_sub[si] = I28x28.shift(v_sub[si], 0, 15, background=0)
+            i2 = v_sub[si].copy()
+            v_sub[si] = I28x28.shift(i1, 0, -15, background=0)
+            i3 = v_sub[si].copy()
+            v_sub[si] = I28x28.shift(i1, -15, -15, background=0)
+            i4 = v_sub[si].copy()
+            show_images([i1, i2, i3, i4])
+        if (si+1) % 100 == 1:
+            print "si:%d      \r"%(si,)
+
     print "calculating autocorrelation",;flush_stdout()
     autocorr = np.dot(v_sub.T, v_sub) / float(sample_size)
     print "."; flush_stdout()
